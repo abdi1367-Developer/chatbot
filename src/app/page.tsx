@@ -1,18 +1,20 @@
 import type { ReactNode } from "react";
 import { botConfig } from "@/config/bot.config";
-import { categories as faqCategories, faqCount, faqItems } from "@/lib/faq-data";
+import {
+  buildFaqGroups,
+  categories as faqCategories,
+  faqCount,
+} from "@/lib/faq-data";
 import { toPersianDigits } from "@/lib/normalize";
-import type { FaqItem } from "@/lib/types";
 import BrandLogo from "@/components/BrandLogo";
 import ChatWidget from "@/components/ChatWidget";
+import FaqExplorer from "@/components/FaqExplorer";
 import OpenChatButton from "@/components/OpenChatButton";
 import Reveal from "@/components/Reveal";
 import {
-  ArrowDownIcon,
   ArrowLeftIcon,
   BoltIcon,
   ClockIcon,
-  DocumentIcon,
   ExternalLinkIcon,
   GridIcon,
   HeadsetIcon,
@@ -23,11 +25,16 @@ import {
 
 const categories = [...faqCategories];
 
-/** چند پرسش منتخب برای بخش سؤالات متداول صفحه */
-const FEATURED_IDS = [1, 13, 17, 27, 47, 63];
-const featuredFaqs: FaqItem[] = FEATURED_IDS.map((id) =>
-  faqItems.find((item) => item.id === id)
-).filter((item): item is FaqItem => Boolean(item));
+/** پرسش‌های پرتکرار، دسته‌بندی‌شده بر اساس موضوع */
+const faqGroups = buildFaqGroups(botConfig.ui.faqPerCategory).map((group) => ({
+  category: group.category,
+  items: group.items.map((item) => ({
+    id: item.id,
+    question: item.question,
+    answer: item.answer,
+    source: item.source,
+  })),
+}));
 
 /** مزایای کلیدی */
 const FEATURES = [
@@ -344,54 +351,18 @@ export default function HomePage() {
 
       {/* ------------------------ سؤالات متداول ------------------------ */}
       <section id="faq" className="scroll-mt-24 bg-slate-50 py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-5">
+        <div className="mx-auto max-w-4xl px-4 sm:px-5">
           <SectionTitle
-            title="پرسش‌های پرتکرار"
-            subtitle="چند نمونه از پرسش‌هایی که دستیار هوشمند پاسخ آن‌ها را می‌داند."
+            title="پرسش‌های پرتکرار به تفکیک موضوع"
+            subtitle="برای هر موضوع، پرتکرارترین پرسش‌ها را یک‌جا ببینید. برای دیدن پاسخ، روی هر پرسش بزنید."
           />
-          <div className="mt-9 space-y-3">
-            {featuredFaqs.map((item, index) => (
-              <Reveal key={item.id} delay={index * 60}>
-                <details className="group rounded-2xl border border-brand-100 bg-white px-4 py-3.5 shadow-soft transition-all duration-300 hover:border-accent-300 open:border-accent-300 open:shadow-lift sm:px-5">
-                <summary className="flex cursor-pointer list-none items-start gap-3 text-[13.5px] font-bold leading-7 text-brand-900 [&::-webkit-details-marker]:hidden">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 ring-1 ring-brand-100 transition group-open:bg-brand-700 group-open:text-white">
-                    <DocumentIcon className="h-4 w-4" />
-                  </span>
-                  <span className="flex-1">{item.question}</span>
-                  <span className="mt-1 shrink-0 text-brand-400 transition group-open:rotate-180">
-                    <ArrowDownIcon className="h-4 w-4" />
-                  </span>
-                </summary>
-                <div className="mt-3 space-y-3 border-t border-dashed border-brand-100 pt-3 pr-10">
-                  <p className="chat-text text-[12.5px] leading-7 text-brand-900/80">
-                    {item.answer}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {item.source ? (
-                      <a
-                        href={item.source}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 underline decoration-dotted underline-offset-4 transition hover:text-brand-800"
-                      >
-                        <ExternalLinkIcon className="h-3 w-3" />
-                        {botConfig.ui.sourceLabel}
-                      </a>
-                    ) : null}
-                    <OpenChatButton
-                      message={item.category}
-                      label={item.category}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-500 transition hover:text-brand-800"
-                    >
-                      <GridIcon className="h-3 w-3" />
-                      مشاهده موضوع «{item.category}»
-                    </OpenChatButton>
-                  </div>
-                </div>
-              </details>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal className="mt-9">
+            <FaqExplorer
+              groups={faqGroups}
+              sourceLabel={botConfig.ui.sourceLabel}
+              chatCtaLabel={botConfig.ui.faqChatCta}
+            />
+          </Reveal>
         </div>
       </section>
 

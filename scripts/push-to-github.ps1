@@ -6,14 +6,24 @@
 #  How to run (open PowerShell inside the project root):
 #     powershell -ExecutionPolicy Bypass -File .\scripts\push-to-github.ps1
 #
-#  It is safe to run more than once.
+#  With your own commit message:
+#     powershell -ExecutionPolicy Bypass -File .\scripts\push-to-github.ps1 -Message "fix: logo"
+#
+#  It is safe to run more than once (first push AND every later update).
 # =============================================================================
+
+param(
+  [string]$Message = ''
+)
 
 $ErrorActionPreference = 'Continue'
 
 $RepoUrl = 'https://github.com/abdi1367-Developer/chatbot.git'
 $Branch  = 'main'
-$Message = 'feat: smart chatbot for Iran Currency & Gold Exchange (Persian search engine, topic menus, responsive UI)'
+
+if ([string]::IsNullOrWhiteSpace($Message)) {
+  $Message = 'update: ' + (Get-Date -Format 'yyyy-MM-dd HH:mm')
+}
 
 function Step([string]$text) { Write-Host "`n==> $text" -ForegroundColor Cyan }
 function Ok([string]$text)   { Write-Host "    [ok] $text" -ForegroundColor Green }
@@ -127,7 +137,23 @@ git branch -M $Branch 2>&1 | Out-Null
 Ok "branch: $Branch"
 
 # -----------------------------------------------------------------------------
-# 8) push
+# 8) sync with the remote (avoids "non-fast-forward" rejections)
+# -----------------------------------------------------------------------------
+Step "Syncing with origin/$Branch ..."
+$remoteHead = (git ls-remote --heads origin $Branch) 2>$null
+if (-not [string]::IsNullOrWhiteSpace($remoteHead)) {
+  git pull --rebase --autostash origin $Branch 2>&1 | Out-Null
+  if ($LASTEXITCODE -ne 0) {
+    Warn 'Automatic rebase failed - continuing anyway.'
+  } else {
+    Ok 'up to date with the remote'
+  }
+} else {
+  Warn "Remote branch '$Branch' does not exist yet - it will be created by the push."
+}
+
+# -----------------------------------------------------------------------------
+# 9) push
 # -----------------------------------------------------------------------------
 Step "Pushing to origin/$Branch ..."
 Write-Host '    (GitHub may ask you to sign in - a browser window or a token may appear)' -ForegroundColor DarkGray

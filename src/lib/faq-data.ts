@@ -31,3 +31,28 @@ export const categories: string[] = Array.from(
 );
 
 export const faqCount = faqItems.length;
+
+export interface FaqGroup {
+  category: string;
+  items: FaqItem[];
+}
+
+/**
+ * دسته‌بندی پرسش‌ها بر اساس موضوع و انتخاب پرتکرارترین‌ها از هر دسته.
+ * ترتیب موضوعات همان ترتیب فایل data.json است.
+ */
+export function buildFaqGroups(perCategory = 6): FaqGroup[] {
+  const buckets = new Map<string, FaqItem[]>();
+  categories.forEach((category) => buckets.set(category, []));
+  faqItems.forEach((item) => {
+    const bucket = buckets.get(item.category);
+    if (bucket) bucket.push(item);
+  });
+
+  return categories
+    .map((category) => ({
+      category,
+      items: (buckets.get(category) ?? []).slice(0, perCategory),
+    }))
+    .filter((group) => group.items.length > 0);
+}
