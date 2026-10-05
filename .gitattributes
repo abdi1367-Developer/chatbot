@@ -1,0 +1,30 @@
+# =============================================================================
+#  .gitattributes
+#  جلوگیری از تبدیل خطوط (CRLF/LF) که می‌تواند فایل‌های تصویری را خراب کند
+# =============================================================================
+
+# تصویرها و فونت‌ها همیشه دودویی هستند
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary
+
+# اسکریپت‌های ویندوزی با پایان خط CRLF بمانند
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# فایل‌های متنی پروژه
+*.ts   text
+*.tsx  text
+*.js   text
+*.mjs  text
+*.json text
+*.css  text
+*.md   text

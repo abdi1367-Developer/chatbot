@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-brand-950 antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-accent-200 text-brand-950;
+  }
+
+  /* اعداد فارسی در تمام رابط کاربری */
+  :root {
+    font-variant-numeric: normal;
+  }
+
+  /* حذف فلش پیش‌فرض <details> در همه مرورگرها */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary {
+    list-style: none;
+  }
+
+  /* فوکوس قابل‌مشاهده برای دسترس‌پذیری */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2;
+  }
+}
+
+@layer components {
+  /* اسکرول‌بار نازک و حرفه‌ای */
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 47, 75, 0.25) transparent;
+  }
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: rgba(15, 47, 75, 0.2);
+    border-radius: 9999px;
+  }
+  .scrollbar-slim::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(15, 47, 75, 0.35);
+  }
+
+  /* متن چت با فاصله خطوط مناسب فارسی */
+  .chat-text {
+    line-height: 1.95;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .chat-gradient {
+    background-image: linear-gradient(135deg, #001a1e 0%, #003843 48%, #004454 100%);
+  }
+
+  .brand-gradient {
+    background-image: linear-gradient(120deg, #004454 0%, #0a7d72 55%, #46b298 100%);
+  }
+
+  .text-gradient-accent {
+    background-image: linear-gradient(100deg, #7bd9be 0%, #46b298 55%, #74c1d1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* هالهٔ نورانی آرام پشت کارت‌ها */
+  .aurora-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(64px);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+
+  .chat-glow {
+    box-shadow: 0 0 0 0 rgba(70, 178, 152, 0.5);
+    animation: pulse-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* موقعیت دکمه شناور با احترام به حاشیه امن iOS */
+  .safe-anchor {
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 640px) {
+  .safe-anchor {
+    bottom: 1.5rem;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(70, 178, 152, 0.42);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(70, 178, 152, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(70, 178, 152, 0);
+  }
+}
+
+/* احترام به تنظیم «کاهش حرکت» کاربر */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* جلوگیری از اسکرول پس‌زمینه در موبایل هنگام باز بودن پنل */
+@media (max-width: 640px) {
+  body.chat-open {
+    overflow: hidden;
+  }
+}
+
+input,
+textarea,
+button {
+  font-family: inherit;
+}
